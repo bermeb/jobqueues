@@ -12,15 +12,11 @@ import tools.jackson.databind.json.JsonMapper;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class RedisStreamListenerAdapter implements StreamListener<String, MapRecord<String, String, String>> {
 
     private final ProcessJob processJob;
     private final JsonMapper jsonMapper;
-
-    public RedisStreamListenerAdapter(ProcessJob processJob, JsonMapper jsonMapper) {
-        this.processJob = processJob;
-        this.jsonMapper = jsonMapper;
-    }
 
     @Override
     public void onMessage(MapRecord<String, String, String> record) {

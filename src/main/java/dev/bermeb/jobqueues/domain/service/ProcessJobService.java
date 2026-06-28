@@ -4,6 +4,7 @@ import dev.bermeb.jobqueues.domain.model.Job;
 import dev.bermeb.jobqueues.domain.port.in.ProcessJob;
 import dev.bermeb.jobqueues.domain.port.out.JobStateStorePort;
 import dev.bermeb.jobqueues.domain.port.out.ProcessJobPort;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.Duration;
@@ -12,15 +13,11 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
+@RequiredArgsConstructor
 public class ProcessJobService implements ProcessJob {
 
     private final JobStateStorePort stateStore;
     private final List<ProcessJobPort> processors;
-
-    public ProcessJobService(JobStateStorePort stateStore, List<ProcessJobPort> processJobs) {
-        this.stateStore = stateStore;
-        this.processors = processJobs;
-    }
 
     @Override
     public void process(Job job, String messageId) {
