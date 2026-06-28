@@ -4,17 +4,15 @@ import dev.bermeb.jobqueues.domain.model.Job;
 import dev.bermeb.jobqueues.domain.port.in.ProcessJob;
 import dev.bermeb.jobqueues.domain.port.out.JobStateStorePort;
 import dev.bermeb.jobqueues.domain.port.out.ProcessJobPort;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@Slf4j
 public class ProcessJobService implements ProcessJob {
-
-    private static final Logger LOG = LoggerFactory.getLogger(ProcessJobService.class);
 
     private final JobStateStorePort stateStore;
     private final List<ProcessJobPort> processors;
@@ -32,15 +30,15 @@ public class ProcessJobService implements ProcessJob {
         if (currentState.isPresent()) {
             Job.JobState jobState = currentState.get();
             if (jobState == Job.JobState.COMPLETED) {
-                LOG.info("Job {} has already been completed.", jobId);
+                log.info("Job {} has already been completed.", jobId);
                 return;
             }
             if (jobState == Job.JobState.FAILED) {
-                LOG.error("Job {} has failed.", jobId);
+                log.error("Job {} has failed.", jobId);
                 return;
             }
             if (jobState == Job.JobState.PROCESSING) {
-                LOG.info("Job {} is currently being processed.", jobId);
+                log.info("Job {} is currently being processed.", jobId);
                 return;
             }
         }
@@ -56,10 +54,10 @@ public class ProcessJobService implements ProcessJob {
             processor.process(job);
 
             stateStore.setState(jobId, Job.JobState.COMPLETED, Duration.ofHours(24));
-            LOG.info("Job {} has been completed.", jobId);
+            log.info("Job {} has been completed.", jobId);
         } catch (Exception e) {
             stateStore.setState(jobId, Job.JobState.RETRY, Duration.ofHours(24));
-            LOG.error("Error while processing job {}: {}. Retrying.", jobId, e.getMessage());
+            log.error("Error while processing job {}: {}. Retrying.", jobId, e.getMessage());
         }
     }
 }
